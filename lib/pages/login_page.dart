@@ -39,13 +39,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: Responsive.vertical(context, 120),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
+                   
                   ),
                   child: ClipOval(
                     child: Image.asset(
@@ -442,7 +436,6 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _handleForgotPassword() async {
     final email = forgotPasswordController.text.trim();
-    
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -458,14 +451,37 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
+      debugPrint('Sending password reset email to: $email');
       final success = await ProfileSettingsAction().resetPasswordViaEmail(
         context: context,
         email: email,
       );
+      debugPrint('Password reset email requested for: $email, success: $success');
 
-      if (success) {
-        Navigator.of(context).pop(); // Close bottom sheet
+      if (success == true) {
+        // Wait for the dialog to be dismissed before closing the bottom sheet
+        await Future.delayed(const Duration(milliseconds: 300));
+        if (context.mounted) {
+          Navigator.of(context).pop(); // Close bottom sheet after dialog
+        }
+      } else {
+        // Show error if sending failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to send password reset email. Please try again.'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     } finally {
       setState(() {
         isForgotPasswordLoading = false;

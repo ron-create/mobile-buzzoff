@@ -102,13 +102,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: Responsive.vertical(context, 50),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
+                       
                       ),
                       child: ClipOval(
                         child: Image.asset(
