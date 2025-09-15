@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="24dp"
+    android:insetTop="24dp"
+    android:insetRight="24dp"
+    android:insetBottom="24dp">
+    <!-- Use the circular logo asset if available; else use current logo -->
+    <bitmap android:src="@drawable/logo" />
+    <!-- If your `@drawable/logo` already includes transparency around a circular mark, it will render circular. -->
+</inset>
+

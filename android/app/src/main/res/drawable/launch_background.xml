@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Full-bleed image background -->
+    <item>
+        <bitmap
+            android:gravity="fill"
+            android:src="@drawable/backgroundscreen" />
+    </item>
+    <!-- Centered logo with extra insets to make it smaller (more spacing around) -->
+    <item android:gravity="center">
+        <inset
+            android:insetLeft="72dp"
+            android:insetTop="72dp"
+            android:insetRight="72dp"
+            android:insetBottom="72dp">
+            <bitmap android:src="@drawable/logo" />
+        </inset>
+    </item>
+</layer-list>

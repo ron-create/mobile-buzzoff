@@ -1,0 +1,972 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2025-02-09T17:53:18Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/8204541",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Pala-Pala Road",
+        "addr:village": "Sampaloc 1",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "name": "Asia Medic Family Hospital and Medical Center",
+        "previously": "way:162625955",
+        "smoking": "no",
+        "type": "multipolygon",
+        "wheelchair": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9566296,
+          14.2990026
+        ]
+      },
+      "id": "relation/8204541"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/8262451",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Governor Dominador Mangubat Boulevard",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare:speciality": "vaccination",
+        "name": "De La Salle University Medical Center",
+        "operator": "De La Salle Medical and Health Sciences Institute",
+        "previously": "way:157807202",
+        "short_name": "DLSUMC",
+        "smoking": "no",
+        "source": "Bing",
+        "source:url": "http://www.freewebs.com/phroadguide/",
+        "type": "multipolygon",
+        "vaccination": "covid19",
+        "wheelchair": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9432449,
+          14.3279662
+        ]
+      },
+      "id": "relation/8262451"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/8541125",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "name": "Pagamutan ng Dasmariñas (Dasmariñas City Hospital)",
+        "operator": "City Government of Dasmariñas",
+        "operator:type": "government",
+        "smoking": "no",
+        "tactile_paving": "no",
+        "type": "multipolygon",
+        "wheelchair": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9615863,
+          14.3230212
+        ]
+      },
+      "id": "relation/8541125"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/8789477",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "name": "St. Paul Hospital",
+        "previously": "way:89986051",
+        "smoking": "no",
+        "type": "multipolygon",
+        "wheelchair": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9624948,
+          14.3231469
+        ]
+      },
+      "id": "relation/8789477"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/8789729",
+        "addr:barangay": "Fatima 1",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4115",
+        "addr:province": "Cavite",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Narciso - Fabella Clinic",
+        "operator": "Fabella",
+        "previously": "node:5353867125",
+        "smoking": "no",
+        "tactile_paving": "no",
+        "type": "multipolygon",
+        "wheelchair": "limited",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.964018,
+          14.3174248
+        ]
+      },
+      "id": "relation/8789729"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/14556403",
+        "access": "no",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:village": "Langkaan 2",
+        "amenity": "hospital",
+        "description": "quarantine facility",
+        "healthcare": "hospital",
+        "name": "Dasmariñas Mega Isolation Facility",
+        "operator": "City of Dasmariñas",
+        "operator:type": "government",
+        "smoking": "no",
+        "type": "multipolygon",
+        "wheelchair": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9474632,
+          14.2516876
+        ]
+      },
+      "id": "relation/14556403"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/274479442",
+        "addr:barangay": "Burol Main",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Governor Dominador Mangubat Boulevard",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "Wellcare Clinic And Laboratory (Vita Plus Center)",
+        "smoking": "no",
+        "wheelchair": "limited",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9503303,
+          14.3269477
+        ]
+      },
+      "id": "way/274479442"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/424875509",
+        "addr:barangay": "Zone 2",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Doroteo Mangubat",
+        "amenity": "hospital",
+        "building": "hospital",
+        "building:levels": "2",
+        "healthcare": "hospital",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "internet_access:operator": "Dasca Cable Services, Inc.",
+        "name": "Leonicio J. Mangubat Memorial Health Center",
+        "operator": "City Government of Dasmariñas",
+        "ref": "CHO-1",
+        "smoking": "no",
+        "wheelchair": "limited",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9315389,
+          14.3293617
+        ]
+      },
+      "id": "way/424875509"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/425510537",
+        "addr:city": "Dasmariñas",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:village": "Salawag",
+        "amenity": "clinic",
+        "healthcare": "centre",
+        "healthcare:speciality": "vaccination",
+        "name": "City Health Office 3",
+        "vaccination": "covid19",
+        "wheelchair": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9800041,
+          14.3448713
+        ]
+      },
+      "id": "way/425510537"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/426729678",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4115",
+        "addr:province": "Cavite",
+        "amenity": "hospital",
+        "building": "yes",
+        "building:levels": "3",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9639548,
+          14.3173987
+        ]
+      },
+      "id": "way/426729678"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/426729720",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4115",
+        "addr:province": "Cavite",
+        "amenity": "hospital",
+        "building": "yes",
+        "building:levels": "2",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9640596,
+          14.3174623
+        ]
+      },
+      "id": "way/426729720"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/456292430",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "GMF Hospital",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9380415,
+          14.3285044
+        ]
+      },
+      "id": "way/456292430"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/555235321",
+        "amenity": "clinic",
+        "building": "hospital",
+        "building:levels": "2",
+        "building:levels:underground": "1",
+        "healthcare": "clinic",
+        "indoor": "wall",
+        "material": "concrete",
+        "name": "Medical Arts Building",
+        "smoking": "no",
+        "wheelchair": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9431368,
+          14.3277516
+        ]
+      },
+      "id": "way/555235321"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/575166088",
+        "addr:city": "Dasmariñas",
+        "addr:postcode": "4114",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "name": "Emilio Aguinaldo College Medical Center-Cavite",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9396518,
+          14.3485842
+        ]
+      },
+      "id": "way/575166088"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/633528895",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "indoor": "room",
+        "name": "Maxicare",
+        "wheelchair": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9537744,
+          14.3011482
+        ]
+      },
+      "id": "way/633528895"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/657255737",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Emilio Aguinaldo Highway",
+        "addr:village": "Sampaloc 1",
+        "amenity": "clinic",
+        "building": "yes",
+        "building:levels": "1",
+        "name": "Sampaloc 1 Health Center",
+        "previously": "node:3666810007",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.956259,
+          14.2966199
+        ]
+      },
+      "id": "way/657255737"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/689820313",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Mangga Street",
+        "addr:village": "Sampaloc 2",
+        "amenity": "clinic",
+        "building": "yes",
+        "building:levels": "2",
+        "healthcare": "birthing_centre",
+        "healthcare:speciality": "maternity",
+        "name": "Norma Viña's Maternity Lying-in Clinic",
+        "previously": "node:6471604401",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9606949,
+          14.2834085
+        ]
+      },
+      "id": "way/689820313"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1060304911",
+        "addr:city": "Dasmariñas",
+        "addr:postcode": "4114",
+        "addr:street": "Emilio Aguinaldo Highway",
+        "air_conditioning": "yes",
+        "amenity": "clinic",
+        "branch": "Dasmariñas",
+        "healthcare": "clinic",
+        "level": "0",
+        "name": "Hi-Precision Diagnostics",
+        "smoking": "no",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9402225,
+          14.3283583
+        ]
+      },
+      "id": "node/1060304911"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1109208882",
+        "amenity": "clinic",
+        "branch": "Sampaloc 3/Piela",
+        "name": "Dasmariñas Social Hygiene Clinic",
+        "operator": "City of Dasmariñas",
+        "operator:type": "government",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9769101,
+          14.2887316
+        ]
+      },
+      "id": "way/1109208882"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1153930549",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:floor": "1st Floor",
+        "addr:housename": "Julian Felipe Hall",
+        "addr:postcode": "4115",
+        "addr:province": "Cavite",
+        "addr:street": "Lake Avenue",
+        "addr:unit": "108",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "indoor": "room",
+        "internet_access": "wlan",
+        "internet_access:access": "private",
+        "internet_access:ssid": "Dlsud ClinicEast",
+        "level": "0",
+        "level:ref": "1",
+        "name": "University Clinic",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9629366,
+          14.3211716
+        ]
+      },
+      "id": "way/1153930549"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1308847898",
+        "amenity": "clinic",
+        "healthcare": "optometrist",
+        "name": "Poblete Optical"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9358934,
+          14.3276204
+        ]
+      },
+      "id": "node/1308847898"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1318774954",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Bacoor-Dasmariñas National Road",
+        "addr:village": "Salawag",
+        "air_conditioning": "yes",
+        "amenity": "hospital",
+        "building:part": "hospital",
+        "healthcare": "hospital",
+        "indoor": "yes",
+        "level": "0;1;2;3;4;5;6",
+        "name": "Dasmariñas City Medical Center",
+        "surveillance": "indoor",
+        "surveillance:type": "camera",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9817964,
+          14.3529723
+        ]
+      },
+      "id": "way/1318774954"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3778738908",
+        "addr:city": "Makati",
+        "addr:housename": "McKinley Exchange Corporate Center",
+        "addr:street": "EDSA",
+        "addr:street:corner": "McKinley Road",
+        "amenity": "clinic",
+        "name": "QualiMed"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0294571,
+          14.5496861
+        ]
+      },
+      "id": "node/3778738908"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3785714613",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "AL Santos Medical Clinic"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9575383,
+          14.3297723
+        ]
+      },
+      "id": "node/3785714613"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4202133877",
+        "amenity": "clinic",
+        "name": "ADB Maternity and Lying Inn"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9439168,
+          14.3163882
+        ]
+      },
+      "id": "node/4202133877"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4487857789",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "Hemotek Renal Center",
+        "name:en": "Hemotek Renal Center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9543606,
+          14.3016805
+        ]
+      },
+      "id": "node/4487857789"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4525647975",
+        "addr:city": "Dasmariñas",
+        "addr:housename": "Felix-Amada Building",
+        "addr:province": "Cavite",
+        "addr:street": "Aguinaldo Highway",
+        "addr:unit": "2F",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "Philippine Red Cross - Dasmariñas Branch",
+        "phone": "+63 916 245 0527",
+        "website": "https://www.facebook.com/redcrossdasma/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.940272,
+          14.3276399
+        ]
+      },
+      "id": "node/4525647975"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4865544021",
+        "amenity": "clinic",
+        "name": "LTP Lying-in Clinic",
+        "name:en": "LTP Lying-in Clinic",
+        "opening_hours": "24/7"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.957185,
+          14.3304068
+        ]
+      },
+      "id": "node/4865544021"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5980456590",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:housename": "Tapawan Building",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Emilio Aguinaldo Highway",
+        "addr:village": "San Agustin 1",
+        "amenity": "clinic",
+        "contact:phone": "+63 46 431 9141",
+        "healthcare": "clinic",
+        "mapillary": "788820511752435",
+        "name": "DASMA-PMP Medical Center",
+        "smoking": "no",
+        "tactile_paving": "no",
+        "wheelchair": "limited"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9541686,
+          14.303544
+        ]
+      },
+      "id": "node/5980456590"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6829233712",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "DIHS Clinic",
+        "operator": "City Schools Division of Dasmariñas;Dasmariñas Integrated High School",
+        "smoking": "no",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9609117,
+          14.3253776
+        ]
+      },
+      "id": "node/6829233712"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6936370479",
+        "amenity": "clinic",
+        "name": "Wellpoint Medical Clinic and Diagnostic Center",
+        "opening_hours": "08:00-21:00",
+        "payment:cash": "yes",
+        "payment:mastercard": "yes",
+        "payment:visa": "yes",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9562439,
+          14.3023445
+        ]
+      },
+      "id": "node/6936370479"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7305037629",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Doroteo Mangubat",
+        "amenity": "clinic",
+        "contact:email": "cho1_dasma@gmail.com",
+        "contact:phone": "+6346 4160279;+639228842553;+63955 3077125",
+        "healthcare": "clinic",
+        "name": "Dasmariñas Social Hygiene Clinic",
+        "operator:type": "government"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9316411,
+          14.329389
+        ]
+      },
+      "id": "node/7305037629"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7328540596",
+        "addr:city": "Makati",
+        "addr:housenumber": "1419",
+        "addr:postcode": "1231",
+        "addr:street": "Campanilla Street",
+        "addr:village": "Dasmarinas Village",
+        "amenity": "clinic",
+        "contact:phone": "+63 2 8893 0215",
+        "healthcare": "clinic",
+        "name": "Barangay Dasmariñas Clinic",
+        "operator:type": "public"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0304718,
+          14.5369756
+        ]
+      },
+      "id": "node/7328540596"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7368478585",
+        "amenity": "clinic",
+        "building": "Dialysis Clinic"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9396994,
+          14.3507042
+        ]
+      },
+      "id": "node/7368478585"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7409673791",
+        "amenity": "clinic",
+        "name": "Family Doc"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9247863,
+          14.3456643
+        ]
+      },
+      "id": "node/7409673791"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8059036571",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:floor": "2/F",
+        "addr:housename": "SM City Dasmariñas Main Building",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Governor Juanito R. Remulla, Sr. Road (Governor's Drive)",
+        "addr:village": "Sampaloc 1",
+        "amenity": "clinic",
+        "branch": "SM Dasmariñas",
+        "healthcare": "clinic",
+        "healthcare:speciality": "dermatology",
+        "level": "2",
+        "name": "Lynderm",
+        "opening_hours": "10:00-21:00",
+        "payment:cash": "yes",
+        "smoking": "no",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9571897,
+          14.3008896
+        ]
+      },
+      "id": "node/8059036571"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8783039937",
+        "amenity": "clinic",
+        "healthcare": "clinic"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9536241,
+          14.3348652
+        ]
+      },
+      "id": "node/8783039937"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9337100296",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:floor": "1/F",
+        "addr:housename": "SM City Dasmariñas Annex Building",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Governor Juanito R. Remulla, Sr. Road",
+        "addr:village": "Sampaloc 1",
+        "amenity": "clinic",
+        "branch": "SM Dasmariñas",
+        "description:covid19": "Mass COVID-19 Vaccination Facility",
+        "healthcare": "clinic",
+        "healthcare:speciality": "vaccination",
+        "max_age": "11",
+        "min_age": "5",
+        "name": "SM Dasmariñas Vaccination Facility 1",
+        "operator": "City Government of Dasmariñas;SM Foundation",
+        "vaccination": "covid19",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9557578,
+          14.3024718
+        ]
+      },
+      "id": "node/9337100296"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9352769058",
+        "amenity": "clinic"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9534866,
+          14.3006525
+        ]
+      },
+      "id": "node/9352769058"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9645614492",
+        "addr:city": "Dasmariñas",
+        "addr:country": "PH",
+        "addr:floor": "1/F",
+        "addr:housename": "SM City Dasmariñas Annex Building",
+        "addr:postcode": "4114",
+        "addr:province": "Cavite",
+        "addr:street": "Governor Juanito R. Remulla, Sr. Road",
+        "addr:village": "Sampaloc 1",
+        "amenity": "clinic",
+        "branch": "SM Dasmariñas",
+        "description:covid19": "Mass COVID-19 Vaccination Facility",
+        "healthcare": "clinic",
+        "healthcare:speciality": "vaccination",
+        "min_age": "12",
+        "name": "SM Dasmariñas Vaccination Facility 2",
+        "operator": "City Government of Dasmariñas;SM Foundation",
+        "vaccination": "covid19",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9559857,
+          14.3024484
+        ]
+      },
+      "id": "node/9645614492"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11284800971",
+        "amenity": "clinic",
+        "name": "Dasma 3 Clinic"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9799232,
+          14.3448199
+        ]
+      },
+      "id": "node/11284800971"
+    }
+  ]
+}

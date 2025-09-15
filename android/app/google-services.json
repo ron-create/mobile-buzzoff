@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "935379904737",
+    "project_id": "buzzoff-c6288",
+    "storage_bucket": "buzzoff-c6288.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935379904737:android:79306ad0d529e27ccfefa0",
+        "android_client_info": {
+          "package_name": "com.company.buzzoff"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpzlYMpxzS-nzeXEOAWJ60JRc3a4KGmEw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+} 
