@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/services.dart';
+import 'dart:ui' as ui;
 import 'dart:convert';
 import '../../actions/map_quick_access_actions.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -35,6 +36,11 @@ class _MapQuickAccessPageState extends State<MapQuickAccessPage> {
   Map<String, dynamic> _barangayJson = {};
   // Removed _mapType and _isBasemapLoading - using Google Maps only
 
+  // Custom marker icons
+  BitmapDescriptor? _hospitalIcon;
+  BitmapDescriptor? _breedingIcon;
+  BitmapDescriptor? _dengueIcon;
+
   // Dasmariñas bounds
   static final LatLngBounds _dasmabounds = LatLngBounds(
     southwest: const LatLng(14.28, 120.88), // Southwest corner
@@ -45,6 +51,7 @@ class _MapQuickAccessPageState extends State<MapQuickAccessPage> {
   void initState() {
     super.initState();
     _loadMapData();
+    _loadCustomIcons();
   }
 
   Future<void> _loadMapData() async {
@@ -98,6 +105,35 @@ class _MapQuickAccessPageState extends State<MapQuickAccessPage> {
         _currentLocation = const LatLng(14.3297, 120.9372);
       });
     }
+  }
+
+  Future<void> _loadCustomIcons() async {
+    try {
+      final hospital = await _loadMarkerIcon('assets/icons/hospital.png', 64);
+      final breeding = await _loadMarkerIcon('assets/icons/breeding_site.png', 56);
+      final dengue = await _loadMarkerIcon('assets/icons/dengue.png', 56);
+      if (mounted) {
+        setState(() {
+          _hospitalIcon = hospital;
+          _breedingIcon = breeding;
+          _dengueIcon = dengue;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading custom icons: $e');
+    }
+  }
+
+  Future<BitmapDescriptor> _loadMarkerIcon(String assetPath, int targetWidth) async {
+    final byteData = await rootBundle.load(assetPath);
+    final codec = await ui.instantiateImageCodec(
+      byteData.buffer.asUint8List(),
+      targetWidth: targetWidth,
+    );
+    final frame = await codec.getNextFrame();
+    final data = await frame.image.toByteData(format: ui.ImageByteFormat.png);
+    final bytes = data!.buffer.asUint8List();
+    return BitmapDescriptor.fromBytes(bytes);
   }
 
   Set<Polygon> _convertGeoJsonToPolygons(Map<String, dynamic> geojson) {
@@ -421,11 +457,16 @@ class _MapQuickAccessPageState extends State<MapQuickAccessPage> {
                     _updateNearbyLocations();
                 },
                 showRadiusControl: _showHospitals || _showBreedingSites || _showDengueCases,
-                  onDirectionsRequested: () {
-                    if (_selectedHospital != null) {
-                      _openDirectionsToHospital(_selectedHospital!);
-                    }
-                  },
+                onDirectionsFromHome: () {
+                  if (_selectedHospital != null) {
+                    _openDirectionsFromHome(_selectedHospital!);
+                  }
+                },
+                onDirectionsFromCurrent: () {
+                  if (_selectedHospital != null) {
+                    _openDirectionsFromCurrent(_selectedHospital!);
+                  }
+                },
                 ),
               ),
             ),
@@ -673,8 +714,7 @@ class _MapQuickAccessPageState extends State<MapQuickAccessPage> {
                 double.parse(hospital['lat'].toString()),
                 double.parse(hospital['lng'].toString()),
               ),
-              // Use custom hospital icon from assets
-              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+              icon: _hospitalIcon ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
               infoWindow: InfoWindow(
                 title: hospital['name'] ?? 'Hospital',
                 snippet: hospital['address'] ?? 'Medical facility',
@@ -701,8 +741,7 @@ class _MapQuickAccessPageState extends State<MapQuickAccessPage> {
           Marker(
             markerId: MarkerId('breeding_site_${site['id']}'),
             position: LatLng(site['latitude'], site['longitude']),
-            // Use Flutter icon - yellow marker for breeding site
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+            icon: _breedingIcon ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
             infoWindow: InfoWindow(
               title: 'Breeding Site',
               snippet: 'Mosquito breeding location',
@@ -720,8 +759,7 @@ class _MapQuickAccessPageState extends State<MapQuickAccessPage> {
           Marker(
             markerId: MarkerId('dengue_case_${case_['id']}'),
             position: LatLng(case_['latitude'], case_['longitude']),
-            // Use Flutter icon - orange marker for dengue case
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+            icon: _dengueIcon ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
             infoWindow: InfoWindow(
               title: 'Dengue Case',
               snippet: 'Reported dengue case location',
@@ -819,6 +857,37 @@ class _MapQuickAccessPageState extends State<MapQuickAccessPage> {
           ),
         );
       }
+    }
+  }
+
+  void _openDirectionsFromHome(Map<String, dynamic> hospital) async {
+    try {
+      if (_currentLocation == null) return;
+      final double destLat = double.parse(hospital['lat'].toString());
+      final double destLng = double.parse(hospital['lng'].toString());
+      await DirectionsService.openDirectionsWithOrigin(
+        originLatitude: _currentLocation!.latitude,
+        originLongitude: _currentLocation!.longitude,
+        destinationLatitude: destLat,
+        destinationLongitude: destLng,
+        destinationName: hospital['name'],
+      );
+    } catch (e) {
+      debugPrint('Error opening directions from home: $e');
+    }
+  }
+
+  void _openDirectionsFromCurrent(Map<String, dynamic> hospital) async {
+    try {
+      if (hospital['lat'] != null && hospital['lng'] != null) {
+        await DirectionsService.openDirections(
+          latitude: double.parse(hospital['lat'].toString()),
+          longitude: double.parse(hospital['lng'].toString()),
+          destinationName: hospital['name'],
+        );
+      }
+    } catch (e) {
+      debugPrint('Error opening directions from current: $e');
     }
   }
 

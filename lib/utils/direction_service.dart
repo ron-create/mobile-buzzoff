@@ -52,6 +52,35 @@ class DirectionsService {
     }
   }
 
+  /// Opens directions with explicit origin and destination
+  static Future<void> openDirectionsWithOrigin({
+    required double originLatitude,
+    required double originLongitude,
+    required double destinationLatitude,
+    required double destinationLongitude,
+    String? destinationName,
+  }) async {
+    try {
+      String url = 'https://www.google.com/maps/dir/?api=1&origin=$originLatitude,$originLongitude&destination=$destinationLatitude,$destinationLongitude';
+      if (destinationName != null) {
+        url += '&destination_place_id=$destinationName';
+      }
+
+      final Uri uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        throw Exception('Could not launch directions URL');
+      }
+    } catch (e) {
+      print('Error opening directions with origin: $e');
+      rethrow;
+    }
+  }
+
   /// Opens a location in Google Maps without directions
   static Future<void> openLocation({
     required double latitude,

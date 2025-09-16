@@ -7,7 +7,8 @@ class MapDetailsModal extends StatelessWidget {
   final double radius;
   final Function(double) onRadiusChanged;
   final bool showRadiusControl;
-  final VoidCallback? onDirectionsRequested;
+  final VoidCallback? onDirectionsFromHome;
+  final VoidCallback? onDirectionsFromCurrent;
 
   const MapDetailsModal({
     super.key,
@@ -17,7 +18,8 @@ class MapDetailsModal extends StatelessWidget {
     required this.radius,
     required this.onRadiusChanged,
     this.showRadiusControl = false,
-    this.onDirectionsRequested,
+    this.onDirectionsFromHome,
+    this.onDirectionsFromCurrent,
   });
 
   @override
@@ -138,13 +140,6 @@ class MapDetailsModal extends StatelessWidget {
                         Icons.local_hospital,
                         const Color(0xFF7A9CB6),
                       ),
-                      _buildEnhancedDetailRow(
-                        context,
-                        'Address',
-                        selectedHospital!['address']?.toString() ?? 'Address not available',
-                        Icons.location_on,
-                        Colors.green,
-                      ),
                     ],
                     if (selectedHospital != null) ...[
                       const SizedBox(height: 24),
@@ -153,39 +148,60 @@ class MapDetailsModal extends StatelessWidget {
                         color: Colors.grey[300],
                       ),
                       const SizedBox(height: 20),
-                      Text(
-                        'Navigation',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF384949),
-                          letterSpacing: 0.3,
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Navigation',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF384949),
+                            letterSpacing: 0.3,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () => _openDirections(context),
-                          icon: const Icon(Icons.directions, color: Colors.white, size: 20),
-                          label: const Text(
-                            'Get Directions',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: onDirectionsFromHome,
+                              icon: const Icon(Icons.home, color: Colors.white, size: 18),
+                              label: const Text(
+                                'From Home',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF7A9CB6),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 2,
+                              ),
                             ),
                           ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF7A9CB6),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: onDirectionsFromCurrent,
+                              icon: const Icon(Icons.my_location, size: 18),
+                              label: const Text(
+                                'From Current',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF384949),
+                                side: const BorderSide(color: Color(0xFF7A9CB6)),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
                             ),
-                            elevation: 3,
-                            shadowColor: const Color(0xFF7A9CB6).withOpacity(0.3),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                     if (showRadiusControl) ...[
@@ -297,9 +313,5 @@ class MapDetailsModal extends StatelessWidget {
     );
   }
 
-  void _openDirections(BuildContext context) {
-    if (onDirectionsRequested != null) {
-      onDirectionsRequested!();
-    }
-  }
+  
 }
