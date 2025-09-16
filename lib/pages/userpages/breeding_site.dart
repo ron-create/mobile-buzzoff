@@ -114,6 +114,18 @@ class _BreedingSiteState extends State<BreedingSite> {
       return;
     }
 
+    // Ensure the tapped point lies within any barangay polygon boundary
+    if (!_isInsideAnyBarangayPolygon(point)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a location within barangay boundaries.'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     // Update location and markers
     _selectedLocation = point;
     _selectedBarangay = _getBarangayFromLocation(point);
@@ -133,6 +145,25 @@ class _BreedingSiteState extends State<BreedingSite> {
 
     // Call the update location callback
     _updateLocation(point, _selectedBarangay!);
+  }
+
+  bool _isInsideAnyBarangayPolygon(LatLng point) {
+    final features = _barangayJson['features'] as List?;
+    if (features == null) return false;
+
+    for (var feature in features) {
+      final geometry = feature['geometry'];
+      if (geometry['type'] == 'Polygon') {
+        List coordinates = geometry['coordinates'][0];
+        List<LatLng> boundaryPoints = coordinates.map((coord) {
+          return LatLng(coord[1], coord[0]);
+        }).toList();
+        if (_isPointInPolygon(point, boundaryPoints)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   String _getBarangayFromLocation(LatLng point) {

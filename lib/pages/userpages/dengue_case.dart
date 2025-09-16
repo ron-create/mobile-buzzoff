@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
 import 'package:geolocator/geolocator.dart' as geo;
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' as services;
 
 class DengueCase extends StatefulWidget {
   const DengueCase({super.key});
@@ -915,6 +916,24 @@ class _DengueCaseState extends State<DengueCase> {
     });
 
     try {
+      // Validate and transform phone for reporting others
+      String? phoneToStore;
+      if (!_isReportingForSelf) {
+        final String digits = _phoneController.text.replaceAll(RegExp(r'\D'), '');
+        if (digits.length != 10) {
+          setState(() {
+            isSubmitting = false;
+          });
+          _showResultModal(
+            isSuccess: false,
+            title: "Invalid Phone",
+            message: "Please enter a 10-digit phone number after +63.",
+          );
+          return;
+        }
+        phoneToStore = '0$digits';
+      }
+
       // Convert latitude/longitude to double
       double? latitude;
       double? longitude;
@@ -937,7 +956,7 @@ class _DengueCaseState extends State<DengueCase> {
         suffixName: _isReportingForSelf ? null : _suffixController.text,
         dateOfBirth: _isReportingForSelf ? null : _dateOfBirthController.text,
         sex: _isReportingForSelf ? null : _sexController.text,
-        phone: _isReportingForSelf ? null : _phoneController.text,
+        phone: _isReportingForSelf ? null : phoneToStore,
         barangayId: _isReportingForSelf ? null : _selectedBarangayId,
         homeAddress: _isReportingForSelf ? null : _homeAddressController.text,
         streetName: _isReportingForSelf ? null : _streetNameController.text,
@@ -1742,7 +1761,7 @@ class _DengueCaseState extends State<DengueCase> {
                             ),
                             const SizedBox(height: 16),
                             
-                            // Suffix - underline only style
+                            // Suffix - dropdown underline only style
                             Container(
                               decoration: BoxDecoration(
                                 border: Border(
@@ -1752,12 +1771,25 @@ class _DengueCaseState extends State<DengueCase> {
                                   ),
                                 ),
                               ),
-                              child: TextField(
-                                controller: _suffixController,
-                                decoration: InputDecoration(
-                                  labelText: 'Suffix (if any)',
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButtonFormField<String>(
+                                  value: _suffixController.text.isNotEmpty ? _suffixController.text : null,
+                                  items: <String>['', 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V']
+                                      .map((value) => DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value.isEmpty ? 'None' : value),
+                                          ))
+                                      .toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _suffixController.text = (value == null || value.isEmpty) ? '' : value;
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Suffix',
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  ),
                                 ),
                               ),
                             ),
@@ -1833,7 +1865,7 @@ class _DengueCaseState extends State<DengueCase> {
                               ),
                             ),
                             
-                            // Phone Number - underline only style
+                            // Phone Number - underline only style with +63 prefix, 10 digits only
                             Container(
                               decoration: BoxDecoration(
                                 border: Border(
@@ -1845,8 +1877,16 @@ class _DengueCaseState extends State<DengueCase> {
                               ),
                               child: TextField(
                                 controller: _phoneController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  services.FilteringTextInputFormatter.digitsOnly,
+                                  services.LengthLimitingTextInputFormatter(10),
+                                ],
                                 decoration: InputDecoration(
                                   labelText: 'Phone Number',
+                                  hintText: '9123456789',
+                                  hintStyle: TextStyle(color: Colors.grey.shade500),
+                                  prefixText: '+63 ',
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                 ),
