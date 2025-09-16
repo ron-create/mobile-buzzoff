@@ -566,4 +566,88 @@ class ProfileSettingsAction {
       return false;
     }
   }
+
+  // Check if email exists in users table with resident role
+  Future<bool> checkEmailExistsInUsersTable(String email) async {
+    try {
+      debugPrint('🔍 Checking if email exists in users table: $email');
+      
+      final result = await Supabase.instance.client
+          .from('users')
+          .select('id, email, role')
+          .eq('email', email)
+          .eq('role', 'resident')
+          .maybeSingle();
+      
+      debugPrint('🔍 Database query result: $result');
+      
+      if (result != null) {
+        debugPrint('✅ Email found in users table with resident role: ${result['email']}');
+        return true;
+      } else {
+        debugPrint('❌ Email not found in users table or not a resident: $email');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('❌ Error checking email in users table: $e');
+      return false;
+    }
+  }
+
+  // Reset password via email without showing dialog (silent version)
+  Future<Map<String, dynamic>> resetPasswordViaEmailSilent({
+    required String email,
+  }) async {
+    try {
+      debugPrint('Sending password reset email to: $email');
+      
+      // First check if email exists in users table with resident role
+      debugPrint('🔍 Checking if email exists in users table...');
+      final emailExists = await checkEmailExistsInUsersTable(email);
+      debugPrint('🔍 Email exists check result: $emailExists');
+      
+      if (!emailExists) {
+        debugPrint('❌ Email validation failed - email not found or not a resident');
+        return {
+          'success': false, 
+          'message': 'Email address not found. Please check your email or create a new account.'
+        };
+      }
+      
+      debugPrint('✅ Email validation passed - proceeding with password reset');
+      
+      // The resetPasswordForEmail method returns void, not AuthResponse
+      await Supabase.instance.client.auth.resetPasswordForEmail(
+        email,
+        redirectTo: null, // You can provide a redirect URL if needed
+      );
+      
+      debugPrint('Password reset email requested for: $email');
+      return {'success': true, 'message': 'Password reset email sent successfully'};
+    } on AuthException catch (e) {
+      debugPrint('Supabase Auth Error: ${e.message}, Status code: ${e.statusCode}');
+      
+      // Handle specific auth errors with better messages
+      String errorMessage;
+      switch (e.message.toLowerCase()) {
+        case 'invalid email':
+        case 'email not found':
+          errorMessage = 'Email address not found. Please check your email or create a new account.';
+          break;
+        case 'too many requests':
+          errorMessage = 'Too many requests. Please wait a few minutes before trying again.';
+          break;
+        case 'invalid email format':
+          errorMessage = 'Please enter a valid email address.';
+          break;
+        default:
+          errorMessage = 'Failed to send password reset email. Please try again.';
+      }
+      
+      return {'success': false, 'message': errorMessage};
+    } catch (e) {
+      debugPrint('Error sending reset email: $e');
+      return {'success': false, 'message': 'An error occurred. Please try again.'};
+    }
+  }
 }

@@ -548,36 +548,90 @@ class _RegisterPageState extends State<RegisterPage> {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        padding: EdgeInsets.fromLTRB(
-          24,
-          24,
-          24,
-          MediaQuery.of(context).viewInsets.bottom + 40, // more safe space
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              children: [
-                Spacer(),
-                IconButton(
-                  icon: Icon(Icons.close, color: Colors.grey[600]),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-            Text(
-              'Terms of Service',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: Responsive.font(context, 20),
+            // Handle bar
+            Container(
+              width: Responsive.horizontal(context, 40),
+              height: Responsive.vertical(context, 4),
+              margin: EdgeInsets.only(top: Responsive.vertical(context, 12)),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE9ECEF),
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            SizedBox(height: 16),
-            Text(
-              'This is a placeholder for the Terms of Service.\n\nReplace this with your actual terms.',
-              style: TextStyle(fontSize: Responsive.font(context, 15)),
-              textAlign: TextAlign.center,
+            SizedBox(height: Responsive.vertical(context, 16)),
+            
+            // Header
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: Responsive.padding(context, 20)),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.description,
+                    color: const Color(0xFF6A89A7),
+                    size: Responsive.icon(context, 24),
+                  ),
+                  SizedBox(width: Responsive.horizontal(context, 10)),
+                  Text(
+                    'Terms of Service',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: Responsive.font(context, 20),
+                      color: const Color(0xFF2C3E50),
+                    ),
+                  ),
+                  Spacer(),
+                  IconButton(
+                    icon: Icon(Icons.close, color: Colors.grey[600]),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: Responsive.vertical(context, 16)),
+            
+            // Content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: Responsive.padding(context, 20)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTermsSection('1. Acceptance of Terms', 
+                      'By accessing and using BuzzOffPH, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.'),
+                    
+                    _buildTermsSection('2. Use License', 
+                      'Permission is granted to temporarily download one copy of BuzzOffPH for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:\n\n• modify or copy the materials\n• use the materials for any commercial purpose or for any public display\n• attempt to reverse engineer any software contained on the website\n• remove any copyright or other proprietary notations from the materials'),
+                    
+                    _buildTermsSection('3. User Responsibilities', 
+                      'As a user of BuzzOffPH, you agree to:\n\n• Provide accurate and truthful information when reporting dengue cases or breeding sites\n• Use the platform responsibly and not submit false or misleading reports\n• Respect the privacy and rights of other users\n• Not use the platform for any illegal or unauthorized purpose\n• Maintain the confidentiality of your account credentials'),
+                    
+                    _buildTermsSection('4. Data Privacy and Protection', 
+                      'We are committed to protecting your privacy and personal information. By using BuzzOffPH, you consent to:\n\n• Collection and processing of your personal data for the purpose of providing our services\n• Sharing of non-personal, aggregated data with health authorities for public health purposes\n• Storage of your data in secure servers with appropriate security measures\n• Use of your contact information for important health alerts and updates'),
+                    
+                    _buildTermsSection('5. Medical Disclaimer', 
+                      'The information provided by BuzzOffPH is for educational and informational purposes only. It is not intended as a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.'),
+                    
+                    _buildTermsSection('6. Limitation of Liability', 
+                      'In no event shall BuzzOffPH or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on BuzzOffPH, even if BuzzOffPH or an authorized representative has been notified orally or in writing of the possibility of such damage.'),
+                    
+                    _buildTermsSection('7. Account Termination', 
+                      'We reserve the right to terminate or suspend your account at any time, without prior notice, for conduct that we believe violates these Terms and Conditions or is harmful to other users, us, or third parties, or for any other reason at our sole discretion.'),
+                    
+                    _buildTermsSection('8. Changes to Terms', 
+                      'We reserve the right to modify these terms at any time. We will notify users of any material changes via email or through the platform. Your continued use of the service after such modifications constitutes acceptance of the updated terms.'),
+                    
+                    _buildTermsSection('9. Contact Information', 
+                      'If you have any questions about these Terms and Conditions, please contact us at:\n\nEmail: support@buzzoffph.com\nPhone: (02) 123-4567\nAddress: City Health Office, Dasmariñas City, Cavite'),
+                    
+                    SizedBox(height: Responsive.vertical(context, 20)),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -595,39 +649,137 @@ class _RegisterPageState extends State<RegisterPage> {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        padding: EdgeInsets.fromLTRB(
-          24,
-          24,
-          24,
-          MediaQuery.of(context).viewInsets.bottom + 40, // more safe space
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              children: [
-                Spacer(),
-                IconButton(
-                  icon: Icon(Icons.close, color: Colors.grey[600]),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-            Text(
-              'Privacy Policy',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: Responsive.font(context, 20),
+            // Handle bar
+            Container(
+              width: Responsive.horizontal(context, 40),
+              height: Responsive.vertical(context, 4),
+              margin: EdgeInsets.only(top: Responsive.vertical(context, 12)),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE9ECEF),
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            SizedBox(height: 16),
-            Text(
-              'This is a placeholder for the Privacy Policy.\n\nReplace this with your actual privacy policy.',
-              style: TextStyle(fontSize: Responsive.font(context, 15)),
-              textAlign: TextAlign.center,
+            SizedBox(height: Responsive.vertical(context, 16)),
+            
+            // Header
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: Responsive.padding(context, 20)),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.privacy_tip,
+                    color: const Color(0xFF6A89A7),
+                    size: Responsive.icon(context, 24),
+                  ),
+                  SizedBox(width: Responsive.horizontal(context, 10)),
+                  Text(
+                    'Privacy Policy',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: Responsive.font(context, 20),
+                      color: const Color(0xFF2C3E50),
+                    ),
+                  ),
+                  Spacer(),
+                  IconButton(
+                    icon: Icon(Icons.close, color: Colors.grey[600]),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: Responsive.vertical(context, 16)),
+            
+            // Content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: Responsive.padding(context, 20)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Effective Date: September 16, 2025',
+                      style: TextStyle(
+                        fontSize: Responsive.font(context, 14),
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF6A89A7),
+                      ),
+                    ),
+                    SizedBox(height: Responsive.vertical(context, 16)),
+                    
+                    _buildTermsSection('1. Introduction', 
+                      'BuzzOffPH ("we", "us", "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.'),
+                    
+                    _buildTermsSection('2. Information We Collect', 
+                      '• Account Information: name, email, barangay, and profile details.\n• Health-related Reports: dengue case reports, breeding site submissions.\n• Device and Usage Data: IP, browser type, pages visited, timestamps.\n• Location Data: when you grant permission for mapping/reporting accuracy.\n• Media and Attachments: files you upload with reports or educational posts.'),
+                    
+                    _buildTermsSection('3. How We Use Your Information', 
+                      '• Provide and maintain services (mapping, reporting, notifications).\n• Verify identity and secure access (authentication, OTP, reCAPTCHA).\n• Analyze trends and improve features (predictive alerts, dashboards).\n• Communicate updates, alerts, and educational content.\n• Comply with legal obligations and public health coordination.'),
+                    
+                    _buildTermsSection('4. Sharing of Information', 
+                      '• Local Health Authorities (CHO, health centers) for public health response.\n• Service Providers (e.g., hosting, email/SMS) under data processing agreements.\n• Legal Requirements: when required by law, court order, or to protect rights.'),
+                    
+                    _buildTermsSection('5. Data Retention', 
+                      'We retain personal data only as long as necessary for service delivery, legal, and reporting purposes. Aggregated or anonymized data may be kept for analytics and research.'),
+                    
+                    _buildTermsSection('6. Data Security', 
+                      'We implement technical and organizational measures to protect your data, including encryption in transit, access controls, and regular reviews. No method of transmission or storage is 100% secure.'),
+                    
+                    _buildTermsSection('7. Your Rights', 
+                      '• Access, correct, or delete your personal data (subject to legal limits).\n• Withdraw consent where processing is based on consent.\n• Object to or restrict certain processing activities.'),
+                    
+                    _buildTermsSection('8. Children\'s Privacy', 
+                      'Our services are not directed to children under 13. We do not knowingly collect personal data from children. If you believe a child has provided data, contact us to remove it.'),
+                    
+                    _buildTermsSection('9. International Transfers', 
+                      'Your data may be processed and stored in locations outside your jurisdiction with appropriate safeguards.'),
+                    
+                    _buildTermsSection('10. Changes to This Policy', 
+                      'We may update this Privacy Policy periodically. Material changes will be notified via email or in-app notice. Continued use means acceptance of updates.'),
+                    
+                    _buildTermsSection('11. Contact Us', 
+                      'For questions or requests, contact: support@buzzoffph.com, (02) 123-4567, City Health Office, Dasmariñas City, Cavite.'),
+                    
+                    SizedBox(height: Responsive.vertical(context, 20)),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTermsSection(String title, String content) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: Responsive.vertical(context, 16)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: Responsive.font(context, 16),
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF2C3E50),
+            ),
+          ),
+          SizedBox(height: Responsive.vertical(context, 8)),
+          Text(
+            content,
+            style: TextStyle(
+              fontSize: Responsive.font(context, 14),
+              color: const Color(0xFF5A6C7D),
+              height: 1.5,
+            ),
+          ),
+        ],
       ),
     );
   }
