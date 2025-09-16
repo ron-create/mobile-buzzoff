@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../actions/dengue_case_actions.dart';
 import '../components/barangay_map_modal.dart';
+import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
+import 'package:geolocator/geolocator.dart' as geo;
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 
 class DengueCase extends StatefulWidget {
   const DengueCase({super.key});
@@ -44,6 +49,12 @@ class _DengueCaseState extends State<DengueCase> {
   bool _showVehicleRequest = false;
   bool _isReportingForSelf = true;
   bool _isLocationSaved = false;
+
+  // Bottom sheet map cache
+  Set<gmap.Polygon> _sheetPolygons = {};
+  List<gmap.LatLng> _sheetBoundary = [];
+  Set<gmap.Marker> _sheetMarkers = {};
+  gmap.LatLng? _sheetTempPoint;
 
   @override
   void initState() {
@@ -205,7 +216,7 @@ class _DengueCaseState extends State<DengueCase> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: _selectedVehicleId == null ? Colors.grey.shade100 : Colors.white,
             border: Border.all(color: Color(0xFF3A4A5A).withOpacity(0.3)),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
@@ -434,20 +445,295 @@ class _DengueCaseState extends State<DengueCase> {
         ? (barangayName ?? 'Unknown')
         : (_selectedBarangayName ?? 'Unknown');
         
-    showDialog(
+    _prepareSheetPolygon(targetBarangayName).then((_) {
+      showModalBottomSheet(
       context: context,
-      builder: (context) => BarangayMapModal(
-        barangayName: targetBarangayName,
-        initialLocation: residentData?['location'],
-        onLocationSelected: (LatLng location) {
+      isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return SafeArea(
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.8,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: StatefulBuilder(
+              builder: (context, setSheetState) {
+                // polygons and boundary now preloaded into _sheetPolygons/_sheetBoundary
+
+                gmap.LatLng initialCenter = const gmap.LatLng(14.3297, 120.9372);
+                if (residentData?['latitude'] != null && residentData?['longitude'] != null) {
+                  final lat = double.tryParse(residentData!['latitude'].toString());
+                  final lng = double.tryParse(residentData!['longitude'].toString());
+                  if (lat != null && lng != null) {
+                    initialCenter = gmap.LatLng(lat, lng);
+                  }
+                }
+
+                return Column(
+                  children: [
+                    // Handle bar
+                    Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    // Header with current location
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Select Location in $targetBarangayName',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF3A4A5A),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed: () async {
+                              try {
+                                final pos = await geo.Geolocator.getCurrentPosition(desiredAccuracy: geo.LocationAccuracy.high);
+                                final current = gmap.LatLng(pos.latitude, pos.longitude);
+                                if (_sheetBoundary.isNotEmpty && !_pointInPolygonGmap(current, _sheetBoundary)) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('You are not in the selected barangay.'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
+                                _sheetTempPoint = current;
+                                setSheetState(() {});
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Pin set to current location.'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Error getting location: ${e.toString()}'), backgroundColor: Colors.red),
+                                );
+                              }
+                            },
+                            icon: const Icon(Icons.my_location, color: Color(0xFF3A4A5A)),
+                            label: const Text('Current Location', style: TextStyle(color: Color(0xFF3A4A5A))),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            icon: const Icon(Icons.close, color: Color(0xFF3A4A5A)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Map content
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                        child: gmap.GoogleMap(
+                          initialCameraPosition: gmap.CameraPosition(target: initialCenter, zoom: 14.0),
+                          polygons: _sheetPolygons,
+                          markers: _sheetTempPoint != null ? { gmap.Marker(
+                            markerId: const gmap.MarkerId('temp'),
+                            position: _sheetTempPoint!,
+                            draggable: true,
+                            onDragEnd: (p) {
+                              if (_sheetBoundary.isNotEmpty && !_pointInPolygonGmap(p, _sheetBoundary)) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Pin must be inside the selected barangay.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              } else {
+                                _sheetTempPoint = p;
+                                setSheetState(() {});
+                              }
+                            },
+                          ) } : {},
+                          myLocationEnabled: true,
+                          myLocationButtonEnabled: true,
+                          zoomControlsEnabled: false,
+                          onTap: (point) {
+                            if (_sheetBoundary.isNotEmpty && !_pointInPolygonGmap(point, _sheetBoundary)) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Please select a location within the selected barangay.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              return;
+                            }
+                            _sheetTempPoint = point;
+                            setSheetState(() {});
+                          },
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (_sheetTempPoint == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Please set a pin inside the barangay boundary.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              return;
+                            }
           setState(() {
-            residentData?['latitude'] = location.latitude.toString();
-            residentData?['longitude'] = location.longitude.toString();
+                              residentData?['latitude'] = _sheetTempPoint!.latitude.toString();
+                              residentData?['longitude'] = _sheetTempPoint!.longitude.toString();
             _isLocationSaved = true;
           });
-        },
-      ),
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Location saved.'), backgroundColor: Colors.green),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF3A4A5A),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          child: const Text('Save Location', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
+    });
+  }
+
+  Future<void> _prepareSheetPolygon(String targetBarangayName) async {
+    try {
+      _sheetPolygons = {};
+      _sheetBoundary = [];
+      final String data = await rootBundle.loadString('assets/geojson/dasmabarangays.geojson');
+      final Map<String, dynamic> jsonData = json.decode(data);
+      final List features = jsonData['features'] as List;
+      for (final feature in features) {
+        final props = feature['properties'];
+        final geometry = feature['geometry'];
+        final name = (props['name'] ?? '').toString();
+        if (name.toLowerCase() == targetBarangayName.toLowerCase() && geometry['type'] == 'Polygon') {
+          final List coords = geometry['coordinates'][0];
+          _sheetBoundary = coords.map<gmap.LatLng>((c) => gmap.LatLng(c[1], c[0])).toList();
+          _sheetPolygons = {
+            gmap.Polygon(
+              polygonId: gmap.PolygonId(name),
+              points: _sheetBoundary,
+              fillColor: Colors.transparent,
+              strokeColor: Colors.black.withOpacity(0.7),
+              strokeWidth: 2,
+            ),
+          };
+          break;
+        }
+      }
+      if (mounted) setState(() {});
+    } catch (_) {}
+  }
+
+  Future<void> _getCurrentLocationAndValidateBarangay(String targetBarangayName) async {
+    try {
+      final serviceEnabled = await geo.Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location services are disabled.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      var permission = await geo.Geolocator.checkPermission();
+      if (permission == geo.LocationPermission.denied) {
+        permission = await geo.Geolocator.requestPermission();
+        if (permission == geo.LocationPermission.denied) return;
+      }
+      if (permission == geo.LocationPermission.deniedForever) return;
+
+      final pos = await geo.Geolocator.getCurrentPosition(desiredAccuracy: geo.LocationAccuracy.high);
+      final placemarks = await geocoding.placemarkFromCoordinates(pos.latitude, pos.longitude);
+      final place = placemarks.isNotEmpty ? placemarks.first : null;
+      final currentBarangayName = (place?.subLocality ?? place?.locality ?? '').toLowerCase();
+      final target = (targetBarangayName).toLowerCase();
+
+      if (currentBarangayName.isNotEmpty && currentBarangayName.contains(target)) {
+        setState(() {
+          residentData?['latitude'] = pos.latitude.toString();
+          residentData?['longitude'] = pos.longitude.toString();
+          _isLocationSaved = true;
+        });
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Location set in $targetBarangayName'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('You are not in the selected barangay.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to get location: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  bool _pointInPolygonGmap(gmap.LatLng point, List<gmap.LatLng> polygon) {
+    bool isInside = false;
+    int j = polygon.length - 1;
+    for (int i = 0; i < polygon.length; i++) {
+      final bool intersect = ((polygon[i].latitude > point.latitude) != (polygon[j].latitude > point.latitude)) &&
+          (point.longitude < (polygon[j].longitude - polygon[i].longitude) *
+                  (point.latitude - polygon[i].latitude) /
+                  (polygon[j].latitude - polygon[i].latitude) +
+              polygon[i].longitude);
+      if (intersect) isInside = !isInside;
+      j = i;
+    }
+    return isInside;
   }
 
   Future<void> _loadAvailableVehicles() async {
@@ -662,14 +948,18 @@ class _DengueCaseState extends State<DengueCase> {
       );
 
       if (_showVehicleRequest) {
-        if (_selectedDate == null || _selectedTime == null || _selectedVehicleId == null) {
+        if (_selectedDate == null ||
+            _selectedTime == null ||
+            _selectedVehicleId == null ||
+            _reasonController.text.trim().isEmpty ||
+            _destinationController.text.trim().isEmpty) {
           setState(() {
             isSubmitting = false;
           });
           _showResultModal(
             isSuccess: false,
             title: "Incomplete Request",
-            message: "Please complete the vehicle request details.",
+            message: "Please complete the vehicle request details (vehicle, schedule, reason, and destination).",
           );
           return;
         }
@@ -818,7 +1108,7 @@ class _DengueCaseState extends State<DengueCase> {
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: (_showVehicleRequest && _selectedVehicleId == null) ? Colors.grey.shade100 : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Color(0xFF3A4A5A).withOpacity(0.2)),
         boxShadow: [
@@ -960,7 +1250,7 @@ class _DengueCaseState extends State<DengueCase> {
               ),
           Container(
             decoration: BoxDecoration(
-            color: Colors.white,
+            color: _selectedBarangayId == null ? Colors.grey.shade100 : Colors.white,
             border: Border.all(color: Color(0xFF3A4A5A).withOpacity(0.3)),
               borderRadius: BorderRadius.circular(12),
             boxShadow: [
@@ -974,11 +1264,39 @@ class _DengueCaseState extends State<DengueCase> {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: _selectedBarangayId,
+              value: _allBarangays.any((b) => b['id'] == _selectedBarangayId) ? _selectedBarangayId : null,
               isExpanded: true,
+              isDense: true,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               icon: Icon(Icons.keyboard_arrow_down, color: Color(0xFF3A4A5A)),
+              hint: Text(
+                'Select Barangay',
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               dropdownColor: Colors.white,
+              menuMaxHeight: 320,
+              itemHeight: 48,
+              selectedItemBuilder: (context) {
+                return _allBarangays.map((barangay) {
+                  return Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      barangay['name'],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF3A4A5A),
+                      ),
+                    ),
+                  );
+                }).toList();
+              },
               items: _allBarangays.map((barangay) {
                 return DropdownMenuItem<String>(
                   value: barangay['id'] as String,
@@ -996,7 +1314,9 @@ class _DengueCaseState extends State<DengueCase> {
                   ),
                 );
               }).toList(),
-              onChanged: (value) {
+              onChanged: _allBarangays.isEmpty
+                  ? null
+                  : (value) {
                 final selectedBarangay = _allBarangays.firstWhere((b) => b['id'] == value);
                 _onBarangaySelected(value!, selectedBarangay['name']);
               },

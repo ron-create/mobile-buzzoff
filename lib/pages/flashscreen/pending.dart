@@ -204,12 +204,15 @@ class _PendingScreenState extends State<PendingScreen> with TickerProviderStateM
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Logo with Rotation Animation
+          // Logo (Static)
           Container(
             width: 140,
             height: 140,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
+              gradient: const LinearGradient(
+                colors: [Color(0xFF6A89A7), Color(0xFF5A7A9A)],
+              ),
               boxShadow: [
                 BoxShadow(
                   color: const Color(0xFF6A89A7).withOpacity(0.2),
@@ -218,28 +221,12 @@ class _PendingScreenState extends State<PendingScreen> with TickerProviderStateM
                 ),
               ],
             ),
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                return Transform.rotate(
-                  angle: _controller.value * 2 * math.pi,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF6A89A7), Color(0xFF5A7A9A)],
-                      ),
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.verified_user,
-                        size: 60,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                );
-              },
+            child: const Center(
+              child: Icon(
+                Icons.verified_user,
+                size: 60,
+                color: Colors.white,
+              ),
             ),
           ),
           const SizedBox(height: 40),
