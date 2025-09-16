@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../actions/setup_account_actions.dart';
 import '../utils/responsive.dart';
@@ -15,10 +16,10 @@ class _SetUpState extends State<SetUp> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController middleNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController suffixNameController = TextEditingController();
   final TextEditingController birthDateController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   String? selectedSex;
+  String? selectedSuffix;
   bool isLoading = true;
   String? barangayName;
   final SetupAccountActions actions = SetupAccountActions();
@@ -44,7 +45,7 @@ class _SetUpState extends State<SetUp> {
     final String firstName = firstNameController.text.trim();
     final String middleName = middleNameController.text.trim();
     final String lastName = lastNameController.text.trim();
-    final String suffixName = suffixNameController.text.trim();
+    final String suffixName = selectedSuffix ?? "";
     final String birthDate = birthDateController.text.trim();
     final String phoneNumber = phoneNumberController.text.trim();
 
@@ -60,6 +61,33 @@ class _SetUpState extends State<SetUp> {
       return;
     }
 
+    final selectedDate = DateTime.parse(birthDate);
+    if (selectedDate.isAfter(DateTime.now())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Date of birth cannot be in the future."),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      setState(() { _isNavigating = false; });
+      return;
+    }
+
+    if (phoneNumber.length != 10 || !phoneNumber.startsWith('9')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter a valid 10-digit phone number starting with 9."),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      setState(() { _isNavigating = false; });
+      return;
+    }
+
+    final String formattedPhoneNumber = "0$phoneNumber";
+
     context.push('/set-home', extra: {
       'firstName': firstName,
       'middleName': middleName,
@@ -67,7 +95,7 @@ class _SetUpState extends State<SetUp> {
       'suffixName': suffixName,
       'birthDate': birthDate,
       'sex': selectedSex,
-      'phoneNumber': phoneNumber,
+      'phoneNumber': formattedPhoneNumber,
       'barangayName': barangayName,
     });
     setState(() { _isNavigating = false; });
@@ -201,10 +229,10 @@ class _SetUpState extends State<SetUp> {
                 buildTextField("First Name *", Icons.person_outline, firstNameController, false),
                 buildTextField("Middle Name", Icons.person_outline, middleNameController, false),
                 buildTextField("Last Name *", Icons.person_outline, lastNameController, false),
-                buildTextField("Suffix", Icons.person_outline, suffixNameController, false),
+                buildSuffixDropdown(),
                 buildDateField(),
                 buildSexDropdown(),
-                buildTextField("Phone Number *", Icons.phone_outlined, phoneNumberController, false, keyboardType: TextInputType.phone),
+                buildPhoneField(),
                 
                 SizedBox(height: Responsive.vertical(context, 30)),
                 
@@ -236,6 +264,131 @@ class _SetUpState extends State<SetUp> {
                 SizedBox(height: Responsive.vertical(context, 60)), // increased safe space at the bottom
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildPhoneField() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: Responsive.vertical(context, 15)),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: TextField(
+          controller: phoneNumberController,
+          keyboardType: TextInputType.phone,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(10),
+            FilteringTextInputFormatter.digitsOnly,
+          ],
+          style: TextStyle(
+            fontSize: Responsive.font(context, 16),
+            color: const Color(0xFF2C3E50),
+          ),
+          decoration: InputDecoration(
+            hintText: "912 345 6789",
+            hintStyle: TextStyle(
+              color: const Color(0xFFADB5BD),
+              fontSize: Responsive.font(context, 16),
+            ),
+            prefixIcon: Icon(
+              Icons.phone_outlined,
+              color: const Color(0xFF6C757D),
+              size: Responsive.icon(context, 20),
+            ),
+            prefixText: "+63 ",
+            prefixStyle: TextStyle(
+              fontSize: Responsive.font(context, 16),
+              color: const Color(0xFF2C3E50),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: Responsive.padding(context, 16),
+              vertical: Responsive.vertical(context, 16),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildSuffixDropdown() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: Responsive.vertical(context, 15)),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: DropdownButtonFormField<String>(
+          value: selectedSuffix,
+          icon: Icon(
+            Icons.keyboard_arrow_down,
+            color: const Color(0xFF6C757D),
+            size: Responsive.icon(context, 20),
+          ),
+          items: ["None", "Jr.", "Sr.", "II", "III", "IV"].map((suffix) {
+            return DropdownMenuItem(
+              value: suffix == "None" ? null : suffix,
+              child: Text(
+                suffix,
+                style: TextStyle(
+                  fontSize: Responsive.font(context, 16),
+                  color: const Color(0xFF2C3E50),
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              selectedSuffix = value;
+            });
+          },
+          decoration: InputDecoration(
+            hintText: "Suffix",
+            hintStyle: TextStyle(
+              color: const Color(0xFFADB5BD),
+              fontSize: Responsive.font(context, 16),
+            ),
+            prefixIcon: Icon(
+              Icons.person_outline,
+              color: const Color(0xFF6C757D),
+              size: Responsive.icon(context, 20),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: Responsive.padding(context, 16),
+              vertical: Responsive.vertical(context, 16),
+            ),
+          ),
+          dropdownColor: Colors.white,
+          style: TextStyle(
+            fontSize: Responsive.font(context, 16),
+            color: const Color(0xFF2C3E50),
           ),
         ),
       ),

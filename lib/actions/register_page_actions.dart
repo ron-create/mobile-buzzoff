@@ -53,8 +53,13 @@ Future<String?> registerUser({
     });
 
     return null; // Success
+  } on AuthException catch (e) {
+    if (e.message.contains('User already registered')) {
+      return 'This email address is already in use.';
+    }
+    return e.message;
   } catch (error) {
-    return "Error: $error";
+    return "An unexpected error occurred. Please try again.";
   }
 }
 
