@@ -354,7 +354,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 icon: Icons.article,
                 title: 'Terms of Service',
                 subtitle: 'Read our terms of service',
-                onTap: () {}, // Implement navigation
+                 onTap: () => context.push('/terms-conditions'),
               ),
             ],
           ),

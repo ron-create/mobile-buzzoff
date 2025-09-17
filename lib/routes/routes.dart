@@ -21,6 +21,7 @@ import '../pages/userpages/barangay_updates.dart';
 import '../pages/userpages/map_quick_access.dart';
 import '../pages/userpages/profile_settings.dart';
 import '../pages/userpages/privacy_policy.dart';
+import '../pages/userpages/terms_service.dart';
 import '../pages/userpages/settings.dart';
 import '../pages/userpages/help.dart';
 import '../pages/userpages/announcements_page.dart';
@@ -184,6 +185,12 @@ GoRoute(
     GoRoute(
       path: '/privacy-policy',
       builder: (context, state) => const PrivacyPolicyPage(),
+    ),
+
+    // Terms of Service Page
+    GoRoute(
+      path: '/terms-conditions',
+      builder: (context, state) => const TermsAndConditionsPage(),
     ),
 
     // Settings Page

@@ -4,10 +4,8 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../../actions/profile_settings_action.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:typed_data';
 import '../../utils/responsive.dart';
-import '../../theme/app_theme.dart';
+import '../../actions/profile_page_action.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
   const ProfileSettingsPage({super.key});
@@ -43,8 +41,10 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   bool _hasChanges = false;
   bool _listenersAttached = false;
   Map<String, String?> _initialValues = {};
+  String? _selectedSuffix;
   
   final List<String> _sexOptions = ['Male', 'Female', 'Other'];
+  final List<String> _suffixOptions = ['', 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V', 'PhD', 'MD', 'RN', 'CPA', 'Esq.'];
   
   // Action instance
   final ProfileSettingsAction _action = ProfileSettingsAction();
@@ -86,6 +86,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         _middleNameController.text = _residentData!['middle_name'] ?? '';
         _lastNameController.text = _residentData!['last_name'] ?? '';
         _suffixController.text = _residentData!['suffix_name'] ?? '';
+        _selectedSuffix = _residentData!['suffix_name'] ?? '';
         _phoneController.text = _residentData!['phone'] ?? '';
         _emailController.text = _userData!['email'] ?? '';
         _addressController.text = _residentData!['address'] ?? '';
@@ -136,6 +137,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       'middleName': _middleNameController.text,
       'lastName': _lastNameController.text,
       'suffix': _suffixController.text,
+      'selectedSuffix': _selectedSuffix,
       'phone': _phoneController.text,
       'email': _emailController.text,
       'dob': _dobController.text,
@@ -152,6 +154,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       'middleName': _middleNameController.text,
       'lastName': _lastNameController.text,
       'suffix': _suffixController.text,
+      'selectedSuffix': _selectedSuffix,
       'phone': _phoneController.text,
       'email': _emailController.text,
       'dob': _dobController.text,
@@ -168,15 +171,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final image = await _action.pickProfileImage();
-    if (image != null) {
-      setState(() {
-        _profileImage = image;
-      });
-      _checkHasChanges();
-    }
-  }
 
   Future<void> _updateProfile() async {
     if (!_formKey.currentState!.validate()) {
@@ -224,7 +218,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
         middleName: _middleNameController.text,
-        suffixName: _suffixController.text,
+        suffixName: _selectedSuffix ?? '',
         phone: _phoneController.text,
         address: _addressController.text,
         sex: _selectedSex!,
@@ -280,6 +274,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         _middleNameController.text = _initialValues['middleName'] ?? '';
                         _lastNameController.text = _initialValues['lastName'] ?? '';
                         _suffixController.text = _initialValues['suffix'] ?? '';
+                        _selectedSuffix = _initialValues['selectedSuffix'] ?? '';
                         _phoneController.text = _initialValues['phone'] ?? '';
                         _emailController.text = _initialValues['email'] ?? '';
                         _dobController.text = _initialValues['dob'] ?? '';
@@ -503,9 +498,24 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 const SizedBox(width: 10),
                 Expanded(
                   flex: 1,
-                  child: _buildTextField(
-                    controller: _suffixController,
+                  child: _buildDropdownField(
                     label: 'Suffix',
+                    value: _selectedSuffix,
+                    items: _suffixOptions.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value.isEmpty ? 'None' : value),
+                      );
+                    }).toList(),
+                    onChanged: !_isEditing
+                        ? null
+                        : (String? newValue) {
+                            setState(() {
+                              _selectedSuffix = newValue;
+                              _suffixController.text = newValue ?? '';
+                            });
+                            _checkHasChanges();
+                          },
                   ),
                 ),
               ],
@@ -522,14 +532,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   child: Text(value),
                 );
               }).toList(),
-              onChanged: !_isEditing
-                  ? null
-                  : (String? newValue) {
-                      setState(() {
-                        _selectedSex = newValue;
-                      });
-                      _checkHasChanges();
-                    },
+              onChanged: null, // Make gender non-editable
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please select your gender';
@@ -638,7 +641,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
-                            'Update Profile',
+                            'Update',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -872,169 +875,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
   }
   
-  // Show forgot password dialog
-  void _showForgotPasswordDialog() {
-    final TextEditingController emailController = TextEditingController();
-    final GlobalKey<FormState> emailFormKey = GlobalKey<FormState>();
-    bool isLoading = false;
-    
-    // Initialize with current email if available
-    if (_userData != null) {
-      emailController.text = _userData!['email'] ?? '';
-    }
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text(
-                'Reset Password',
-                style: TextStyle(
-                  color: Color(0xFF333333),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              content: Form(
-                key: emailFormKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'We will send a password reset link to your email address.',
-                      style: TextStyle(
-                        color: Color(0xFF666666),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: 'Email Address',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        prefixIcon: const Icon(Icons.email_outlined),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: isLoading
-                      ? null
-                      : () {
-                          Navigator.of(context).pop();
-                        },
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: isLoading
-                      ? null
-                      : () async {
-                          if (emailFormKey.currentState!.validate()) {
-                            setState(() {
-                              isLoading = true;
-                            });
-                            
-                            final success = await _action.resetPasswordViaEmail(
-                              context: context,
-                              email: emailController.text,
-                            );
-                            
-                            if (success && mounted) {
-                              Navigator.of(context).pop();
-                            } else {
-                              setState(() {
-                                isLoading = false;
-                              });
-                            }
-                          }
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5271FF),
-                  ),
-                  child: isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Text('Send Reset Link'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    ).then((_) {
-      // Dispose controller when dialog is closed
-      emailController.dispose();
-    });
-  }
-
-  // Build a photo option button with better styling
-  Widget _buildPhotoOption({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    bool primary = false,
-    bool light = false,
-    Color? color,
-  }) {
-    final buttonColor = color ?? (primary ? const Color(0xFF5271FF) : Colors.grey.shade600);
-    
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: light ? Colors.white.withOpacity(0.25) : buttonColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon, 
-                color: light ? Colors.white : buttonColor, 
-                size: 22
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: light ? Colors.white : buttonColor,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 } 
 
 // Separate widget for the change password modal to avoid state management issues
@@ -1068,6 +909,44 @@ class _ChangePasswordModalState extends State<_ChangePasswordModal> {
     newPasswordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  // Show logout warning dialog
+  Future<bool?> _showLogoutWarningDialog() async {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Password Changed Successfully',
+            style: TextStyle(
+              color: Color(0xFF333333),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: const Text(
+            'Your password has been changed successfully. For security reasons, you will be logged out and need to sign in again with your new password.',
+            style: TextStyle(
+              color: Color(0xFF666666),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF5271FF),
+              ),
+              child: const Text('Logout', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -1275,7 +1154,15 @@ class _ChangePasswordModalState extends State<_ChangePasswordModal> {
                                     );
                                     
                                     if (success && mounted) {
-                                      widget.onSuccess();
+                                      // Show logout warning dialog
+                                      final shouldLogout = await _showLogoutWarningDialog();
+                                      if (shouldLogout == true) {
+                                        widget.onSuccess();
+                                        // Logout after successful password change
+                                        ProfilePageAction.logout(context);
+                                      } else {
+                                        widget.onSuccess();
+                                      }
                                     } else if (mounted) {
                                       setState(() {
                                         isLoading = false;
