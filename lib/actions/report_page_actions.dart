@@ -460,7 +460,7 @@ class ReportPageActions {
     try {
       final response = await Supabase.instance.client
           .from('breeding_sites_reports')
-          .select('id, latitude, longitude, image, barangay_id, status, description, created_at, barangay(name)')
+          .select('id, latitude, longitude, image, barangay_id, status, description, created_at, barangay(name), updated_at')
           .eq('resident_id', residentId)
           .neq('status', 'Resolved')
           .order('created_at', ascending: false);
@@ -479,6 +479,7 @@ class ReportPageActions {
         'status': report['status'],
         'description': report['description'],
         'created_at': report['created_at'],
+        'updated_at': report['updated_at'],
       }).toList();
     } catch (error) {
       debugPrint('Error fetching breeding site reports: $error');
@@ -490,7 +491,7 @@ class ReportPageActions {
     try {
       final response = await Supabase.instance.client
           .from('breeding_sites_reports')
-          .select('id, latitude, longitude, image, barangay_id, status, description, created_at, barangay(name)')
+          .select('id, latitude, longitude, image, barangay_id, status, description, created_at, barangay(name), updated_at')
           .eq('resident_id', residentId)
           .eq('status', 'Resolved')
           .order('created_at', ascending: false);
@@ -509,6 +510,7 @@ class ReportPageActions {
         'status': report['status'],
         'description': report['description'],
         'created_at': report['created_at'],
+        'updated_at': report['updated_at'],
       }).toList();
     } catch (error) {
       debugPrint('Error fetching breeding site history: $error');
@@ -517,8 +519,10 @@ class ReportPageActions {
   }
 
   static void showReportDetailsModal(BuildContext context, Map<String, dynamic> report, String reportType) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (BuildContext dialogContext) {
         return ReportDetailsModal(report: report, reportType: reportType);
       },
@@ -527,10 +531,35 @@ class ReportPageActions {
 
   static Color getStatusColor(String status) {
     switch (status.toLowerCase()) {
-      case 'pending':
+      // Breeding site statuses
+      case 'reported':
+        return Colors.orange;
+      case 'in-progress':
+        return Colors.blue;
+      case 'resolved':
+        return Colors.green;
+      
+      // Dengue case statuses
+      case 'suspected':
         return Colors.orange;
       case 'confirmed':
+        return Colors.blue;
+      case 'invalid':
+        return Colors.red;
+      case 'probable':
+        return Colors.purple;
+      
+      // Vehicle request statuses
+      case 'pending':
+        return Colors.orange;
+      case 'approved':
+        return Colors.blue;
+      case 'declined':
+        return Colors.red;
+      case 'completed':
         return Colors.green;
+      
+      // Legacy statuses (for backward compatibility)
       case 'rejected':
         return Colors.red;
       default:

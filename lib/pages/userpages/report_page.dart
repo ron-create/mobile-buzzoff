@@ -327,18 +327,10 @@ Widget _buildReportList(Future<List<Map<String, dynamic>>> futureReports, {requi
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
-                              color: report['vehicle_request']['status'] == 'Pending' 
-                                ? Colors.orange.shade50 
-                                : report['vehicle_request']['status'] == 'Approved'
-                                  ? Colors.green.shade50
-                                  : Colors.red.shade50,
+                              color: _getStatusColor(report['vehicle_request']['status']).withOpacity(0.15),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: report['vehicle_request']['status'] == 'Pending'
-                                  ? Colors.orange.shade200
-                                  : report['vehicle_request']['status'] == 'Approved'
-                                    ? Colors.green.shade200
-                                    : Colors.red.shade200,
+                                color: _getStatusColor(report['vehicle_request']['status']).withOpacity(0.3),
                               ),
                             ),
                             child: Row(
@@ -350,22 +342,14 @@ Widget _buildReportList(Future<List<Map<String, dynamic>>> futureReports, {requi
                                     : report['vehicle_request']['status'] == 'Approved'
                                       ? Icons.check_circle
                                       : Icons.cancel,
-                                  color: report['vehicle_request']['status'] == 'Pending'
-                                    ? Colors.orange
-                                    : report['vehicle_request']['status'] == 'Approved'
-                                      ? Colors.green
-                                      : Colors.red,
+                                  color: _getStatusColor(report['vehicle_request']['status']),
                                   size: 20,
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Vehicle: ${report['vehicle_request']['status']}',
                                   style: TextStyle(
-                                    color: report['vehicle_request']['status'] == 'Pending'
-                                      ? Colors.orange.shade900
-                                      : report['vehicle_request']['status'] == 'Approved'
-                                        ? Colors.green.shade900
-                                        : Colors.red.shade900,
+                                    color: _getStatusColor(report['vehicle_request']['status']),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -416,9 +400,6 @@ Widget _buildReportList(Future<List<Map<String, dynamic>>> futureReports, {requi
 
 // Helper function to get status color
 Color _getStatusColor(String status) {
-  if (status.toLowerCase() == 'resolved') {
-    return Colors.green;
-  }
   return ReportPageActions.getStatusColor(status);
 }
 
