@@ -360,8 +360,8 @@ class ReportPageActions {
     }
   }
 
-  // Fetch other dengue history you reported (where reporter_id = your user_id AND closed_by is not null)
-  static Future<List<Map<String, dynamic>>> fetchOtherDengueHistory(String userId) async {
+  // Fetch other dengue history you reported (where reporter_id = your user_id AND closed_by is not null, and resident_id != your resident_id)
+  static Future<List<Map<String, dynamic>>> fetchOtherDengueHistory(String userId, {String? residentId}) async {
     try {
       final response = await Supabase.instance.client
           .from('dengue_cases')
@@ -382,14 +382,19 @@ class ReportPageActions {
           .not('closed_by', 'is', null)
           .order('created_at', ascending: false);
 
-      debugPrint('Fetching other dengue history for reporter_id: $userId');
+      debugPrint('Fetching other dengue history for reporter_id: $userId, excluding resident_id: $residentId');
       debugPrint('Response: $response');
 
       if (response.isEmpty) {
         return [];
       }
 
-      return response.map<Map<String, dynamic>>((report) => {
+      // Filter out self-reports in Dart
+      final filtered = residentId == null
+        ? response
+        : response.where((report) => report['resident_id'] != residentId).toList();
+
+      return filtered.map<Map<String, dynamic>>((report) => {
         'id': report['id'],
         'resident_id': report['resident_id'],
         'name': report['resident'] != null 

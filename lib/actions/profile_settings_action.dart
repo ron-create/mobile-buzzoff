@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
+import 'package:go_router/go_router.dart';
 
 class ProfileSettingsAction {
   // Singleton pattern
@@ -314,7 +315,7 @@ class ProfileSettingsAction {
           }
         }
       }
-      
+
       debugPrint('Storage configuration check completed');
     } catch (e) {
       debugPrint('⚠️ Error checking storage configuration: $e');
@@ -450,51 +451,85 @@ class ProfileSettingsAction {
   
   // Change password action
   Future<bool> changePassword({
-    required BuildContext context,
+    required BuildContext modalContext,
+    required BuildContext rootContext,
     required String currentPassword,
     required String newPassword,
   }) async {
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
+
+    if (user == null || user.email == null) {
+      if (rootContext.mounted) {
+        ScaffoldMessenger.of(rootContext).showSnackBar(
+          const SnackBar(content: Text('User not found or email is missing.')),
+        );
+      }
+      return false;
+    }
+
     try {
-      final response = await Supabase.instance.client.auth.updateUser(
-        UserAttributes(
-          password: newPassword,
-        ),
-        // Current password is required for security
-        emailRedirectTo: null,
+      // 1. Re-authenticate by signing in again with the current password.
+      // This verifies the current password is correct.
+      await supabase.auth.signInWithPassword(
+        email: user.email!,
+        password: currentPassword,
       );
-      
+
+      // 2. If re-authentication is successful, update to the new password.
+      final response = await supabase.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+
       if (response.user != null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Password changed successfully')),
+        if (modalContext.mounted) {
+          Navigator.of(modalContext).pop(); // Close the modal
+        }
+
+        if (rootContext.mounted) {
+          ScaffoldMessenger.of(rootContext).showSnackBar(
+            const SnackBar(
+              content: Text('Password changed successfully. You will be logged out.'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
           );
+
+          // Wait for snackbar to be visible, then sign out and redirect.
+          await Future.delayed(const Duration(seconds: 2));
+          await supabase.auth.signOut();
+          rootContext.go('/');
         }
         return true;
       } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to change password')),
+        if (rootContext.mounted) {
+          ScaffoldMessenger.of(rootContext).showSnackBar(
+            const SnackBar(content: Text('Failed to change password. Please try again.')),
           );
         }
         return false;
       }
     } on AuthException catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error changing password: ${e.message}')),
+      // Handle specific error for invalid credentials
+      final message = e.message == 'Invalid login credentials'
+          ? 'Incorrect current password.'
+          : 'Error: ${e.message}';
+      if (rootContext.mounted) {
+        ScaffoldMessenger.of(rootContext).showSnackBar(
+          SnackBar(content: Text(message)),
         );
       }
       return false;
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error changing password: ${e.toString()}')),
+      if (rootContext.mounted) {
+        ScaffoldMessenger.of(rootContext).showSnackBar(
+          SnackBar(content: Text('An unexpected error occurred: $e')),
         );
       }
       return false;
     }
   }
-  
+
   // Reset password via email with improved verification
   Future<bool> resetPasswordViaEmail({
     required BuildContext context, 

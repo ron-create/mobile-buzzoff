@@ -7,6 +7,7 @@ import '../../actions/profile_settings_action.dart';
 import '../../utils/responsive.dart';
 import '../../actions/profile_page_action.dart';
 
+
 class ProfileSettingsPage extends StatefulWidget {
   const ProfileSettingsPage({super.key});
 
@@ -855,8 +856,10 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
   // Show change password dialog
   void _showChangePasswordDialog() {
+    // The root context from the page
+    final rootContext = context;
     showModalBottomSheet(
-      context: context,
+      context: rootContext,
       isScrollControlled: true,
       isDismissible: true,
       enableDrag: true,
@@ -864,12 +867,10 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (BuildContext context) {
+      builder: (BuildContext modalContext) {
         return _ChangePasswordModal(
           action: _action,
-          onSuccess: () {
-            Navigator.of(context).pop();
-          },
+          parentContext: rootContext, // Pass the page's context here
         );
       },
     );
@@ -881,11 +882,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 // Separate widget for the change password modal to avoid state management issues
 class _ChangePasswordModal extends StatefulWidget {
   final ProfileSettingsAction action;
-  final VoidCallback onSuccess;
+  final BuildContext parentContext;
 
   const _ChangePasswordModal({
     required this.action,
-    required this.onSuccess,
+    required this.parentContext,
   });
 
   @override
@@ -909,44 +910,6 @@ class _ChangePasswordModalState extends State<_ChangePasswordModal> {
     newPasswordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
-  }
-
-  // Show logout warning dialog
-  Future<bool?> _showLogoutWarningDialog() async {
-    return showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Password Changed Successfully',
-            style: TextStyle(
-              color: Color(0xFF333333),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: const Text(
-            'Your password has been changed successfully. For security reasons, you will be logged out and need to sign in again with your new password.',
-            style: TextStyle(
-              color: Color(0xFF666666),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF5271FF),
-              ),
-              child: const Text('Logout', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -1138,46 +1101,30 @@ class _ChangePasswordModalState extends State<_ChangePasswordModal> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: isLoading
-                            ? null
-                            : () async {
-                                if (passwordFormKey.currentState!.validate()) {
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-                                  
-                                  try {
-                                    final success = await widget.action.changePassword(
-                                      context: context,
-                                      currentPassword: currentPasswordController.text,
-                                      newPassword: newPasswordController.text,
-                                    );
-                                    
-                                    if (success && mounted) {
-                                      // Show logout warning dialog
-                                      final shouldLogout = await _showLogoutWarningDialog();
-                                      if (shouldLogout == true) {
-                                        widget.onSuccess();
-                                        // Logout after successful password change
-                                        ProfilePageAction.logout(context);
-                                      } else {
-                                        widget.onSuccess();
-                                      }
-                                    } else if (mounted) {
-                                      setState(() {
-                                        isLoading = false;
-                                      });
-                                    }
-                                  } catch (e) {
-                                    if (mounted) {
-                                      setState(() {
-                                        isLoading = false;
-                                      });
-                                    }
-                                  }
+                      onPressed: isLoading
+                          ? null
+                          : () async {
+                              if (passwordFormKey.currentState!.validate()) {
+                                setState(() => isLoading = true);
+
+                                final success = await widget.action.changePassword(
+                                  modalContext: context, // Use the modal's context to pop
+                                  rootContext: widget.parentContext, // Use the page's context for navigation/snackbar
+                                  currentPassword: currentPasswordController.text,
+                                  newPassword: newPasswordController.text,
+                                );
+
+                                // If the password change fails, re-enable the button
+                                if (!success && mounted) {
+                                  setState(() => isLoading = false);
                                 }
-                              },
-                        style: ElevatedButton.styleFrom(
+                                // On success, the modal is closed and user is logged out,
+                                // so no need to set isLoading to false here.
+                              }
+                            },
+
+
+                          style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF5271FF),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -1205,4 +1152,4 @@ class _ChangePasswordModalState extends State<_ChangePasswordModal> {
       ),
     );
   }
-} 
+}

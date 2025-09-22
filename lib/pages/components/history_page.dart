@@ -44,7 +44,7 @@ class _HistoryPageState extends State<HistoryPage> with SingleTickerProviderStat
     if (residentId != null && userId != null) {
       setState(() {
         _yourDengueHistoryFuture = ReportPageActions.fetchYourDengueHistory(residentId!);
-        _otherDengueHistoryFuture = ReportPageActions.fetchOtherDengueHistory(userId!);
+        _otherDengueHistoryFuture = ReportPageActions.fetchOtherDengueHistory(userId!, residentId: residentId!);
         _breedingHistoryFuture = ReportPageActions.fetchBreedingSiteHistory(residentId!);
       });
     }
@@ -54,7 +54,7 @@ class _HistoryPageState extends State<HistoryPage> with SingleTickerProviderStat
     if (residentId != null && userId != null) {
       setState(() {
         _yourDengueHistoryFuture = ReportPageActions.fetchYourDengueHistory(residentId!);
-        _otherDengueHistoryFuture = ReportPageActions.fetchOtherDengueHistory(userId!);
+        _otherDengueHistoryFuture = ReportPageActions.fetchOtherDengueHistory(userId!, residentId: residentId!);
         _breedingHistoryFuture = ReportPageActions.fetchBreedingSiteHistory(residentId!);
       });
     }

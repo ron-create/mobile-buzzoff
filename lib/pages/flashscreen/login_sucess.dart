@@ -12,28 +12,37 @@ class LoginSuccess extends StatefulWidget {
 class _LoginSuccessState extends State<LoginSuccess>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late Animation<double> _rotationAnimation;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
     
-    _rotationAnimation = Tween<double>(
+    _fadeAnimation = Tween<double>(
       begin: 0,
       end: 1,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeInOut,
+      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+    ));
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
     ));
 
     // Start the animation
     _animationController.forward();
 
-    // Navigate to home after animation completes
+    // Navigate to home after delay
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         context.go('/home');
@@ -50,78 +59,97 @@ class _LoginSuccessState extends State<LoginSuccess>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFBDDDFC),
+      backgroundColor: Colors.white,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Rotating Logo
-            AnimatedBuilder(
-              animation: _rotationAnimation,
-              builder: (context, child) {
-                return Transform.rotate(
-                  angle: _rotationAnimation.value * 2 * 3.14159,
-                  child: Container(
-                    width: Responsive.horizontal(context, 120),
-                    height: Responsive.vertical(context, 120),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/logo.png',
-                        fit: BoxFit.cover,
+        child: AnimatedBuilder(
+          animation: _animationController,
+          builder: (context, child) {
+            return FadeTransition(
+              opacity: _fadeAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Success Icon
+                    Container(
+                      width: Responsive.horizontal(context, 100),
+                      height: Responsive.vertical(context, 100),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4CAF50),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF4CAF50).withOpacity(0.3),
+                            blurRadius: 20,
+                            spreadRadius: 5,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.check,
+                        size: Responsive.font(context, 50),
+                        color: Colors.white,
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
-            SizedBox(height: Responsive.vertical(context, 30)),
-            
-            // Success Text
-            Text(
-              'Welcome Back!',
-              style: TextStyle(
-                fontSize: Responsive.font(context, 28),
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF2C3E50),
+                    SizedBox(height: Responsive.vertical(context, 32)),
+                    
+                    // Success Title
+                    Text(
+                      'Login Successful',
+                      style: TextStyle(
+                        fontSize: Responsive.font(context, 26),
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF2E3A59),
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    SizedBox(height: Responsive.vertical(context, 12)),
+                    
+                    // Welcome Message
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: Responsive.horizontal(context, 32),
+                      ),
+                      child: Text(
+                        'Welcome back! You have been successfully authenticated.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: Responsive.font(context, 16),
+                          color: const Color(0xFF64748B),
+                          height: 1.5,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: Responsive.vertical(context, 48)),
+                    
+                    // Progress Indicator
+                    SizedBox(
+                      width: Responsive.horizontal(context, 24),
+                      height: Responsive.vertical(context, 24),
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5271FF)),
+                      ),
+                    ),
+                    SizedBox(height: Responsive.vertical(context, 16)),
+                    
+                    // Redirecting Text
+                    Text(
+                      'Taking you to your dashboard...',
+                      style: TextStyle(
+                        fontSize: Responsive.font(context, 14),
+                        color: const Color(0xFF94A3B8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: Responsive.vertical(context, 10)),
-            
-            Text(
-              'Login Successful',
-              style: TextStyle(
-                fontSize: Responsive.font(context, 16),
-                color: const Color(0xFF7F8C8D),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            SizedBox(height: Responsive.vertical(context, 40)),
-            
-            // Loading indicator
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6A89A7)),
-              strokeWidth: 3,
-            ),
-            SizedBox(height: Responsive.vertical(context, 20)),
-            
-            Text(
-              'Redirecting to Home...',
-              style: TextStyle(
-                fontSize: Responsive.font(context, 14),
-                color: const Color(0xFF95A5A6),
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
